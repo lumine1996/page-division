@@ -1,0 +1,420 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<style type="text/css">
+    body {
+        overflow: hidden;
+    }
+    span {
+        color: white;
+        margin-left: 10px;
+    }
+    .div-iframe {
+        float: left;
+        display: inline;
+        border-right: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        z-index: 0;
+    }
+    .div-max {
+        z-index: 90;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: white;
+    }
+    .iframe-cell {
+        -ms-zoom: 0.333;
+        -moz-transform: scale(0.333);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(0.333);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(0.333);
+        -webkit-transform-origin: 0 0;
+        z-index: 0;
+        display: inline-block;
+        border: none;
+        border-spacing: 0;
+    }
+    .iframe-max {
+        -ms-zoom: 100%;
+        -moz-transform: scale(1);
+        -moz-transform-origin: 0 0;
+        -o-transform: scale(1);
+        -o-transform-origin: 0 0;
+        -webkit-transform: scale(1);
+        -webkit-transform-origin: 0 0;
+        border: none;
+    }
+    .div-covers {
+        position: absolute;
+        z-index: 80;
+        top: 0;
+        left: 0;
+    }
+    .div-cell {
+        float: left;
+        display: inline;
+    }
+    .div-cover {
+        display: none;
+        opacity: 0.1;
+        background: midnightblue;
+    }
+    .div-bar {
+        display: none;
+        opacity: 0.8;
+        background: dodgerblue;
+    }
+    .div-restore {
+        display: none;
+        position: fixed;
+        top: 300px;
+        right: -55px;
+        width: 70px;
+        height: 30px;
+        z-index: 100;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        background: dodgerblue;
+        transition: right 0.5s;
+    }
+    .div-restore:hover {
+        right: 0;
+    }
+    .edit-button {
+        float: right;
+        margin-top: 4px;
+        margin-right: 10px;
+        color: white;
+        cursor: pointer;
+    }
+</style>
+<html lang="zh-cn">
+
+<head>
+    <title>网页分屏</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="icon" href="./img/icon.png" >
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/popper.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+<body style="margin: 0">
+<script type="text/javascript">
+    // 后端地址
+    const domain = "http://47.100.137.154:8090";
+    // 配置数组
+    let config;
+    // 当前位置
+    let current = 1;
+    // 是否全屏
+    let isFullScreen = false;
+
+    // onload事件，调整和填充页面，绑定事件等
+    $(function(){
+        // 调整iframe和遮盖div的大小
+        adaptCell();
+
+        // 鼠标移入移出事件
+        let divCell = $(".div-cell");
+        divCell.on("mouseover", function () {
+            current = $(this).attr('id').substr(3);
+            console.log("current: " + current);
+            $(this).children().show();
+        });
+        divCell.on("mouseout", function () {
+            $(this).children().hide();
+        });
+        let editButton = $(".edit-button");
+        editButton.on("mouseover", function () {
+            $(this).css({"color":"greenyellow"})
+        });
+        editButton.on("mouseout", function () {
+            $(this).css({"color":"white"})
+        });
+
+        // 查询配置，并设置iframe的src及遮盖div的点击事件
+        $.get(domain + "/config/query/preset", function(data){
+            console.log(data);
+            config = data;
+            let url;
+            for (let i = 1; i <= 9; i++) {
+                url = data[i];
+                $("#iframe" + i).attr("src", url);
+                $("#cover" + i).attr("onclick", "fullScreen(" + i + ")");
+            }
+        });
+
+        // 记住当前页
+        $.post(domain + "/config/update/preset/0?src=8", {}, function (result) {
+            console.log(result);
+        });
+
+        // 启用弹出框
+        // $("[data-toggle='popover']").popover();
+    });
+
+    // 窗口调整事件
+    $(window).resize(function() {
+        console.log("resize");
+
+        if (isFullScreen) {
+            adaptFull();
+        } else {
+            adaptCell();
+        }
+    });
+
+    // 调整各小窗口元素大小，使适应窗口
+    function adaptCell() {
+        // 调整iframe和遮盖div的大小
+        let innerHeight = window.innerHeight;
+        let innerWidth = window.innerWidth;
+        console.log("innerHeight: " + innerHeight + ", innerWidth: " + innerWidth);
+        let cellHeight = innerHeight / 3;
+        let cellWidth = innerWidth / 3;
+        let divCell = $(".div-cell");
+        let divCover = $(".div-cover");
+        let divBar = $(".div-bar");
+        let iframeCell = $(".iframe-cell");
+        let divIframe = $(".div-iframe");
+        divCell.css({"height":cellHeight, "width":cellWidth});
+        divCover.css({"height":cellHeight - 24, "width":cellWidth});
+        divBar.css({"height":24, "width":cellWidth});
+        iframeCell.css({"width":innerWidth - 3, "height":innerHeight - 3});
+        divIframe.css({"height":cellHeight, "width":cellWidth});
+    }
+
+    // 打开编辑弹窗
+    function edit(num) {
+        // current = num;
+        $("#editModal").modal("show");
+        $("#input1").val(config[num]);
+
+    }
+
+    // 保存
+    function save() {
+        let text = $("#input1").val();
+        let forbiddenSpan = $("#forbiddenSpan");
+        let editModal = $("#editModal");
+        // 未修改
+        if (text === config[current]) {
+            editModal.modal("hide");
+            return false;
+        }
+
+        // 格式校验与协议补全
+        let regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/;
+        if (!regex.test(text)) {
+            forbiddenSpan.show();
+            return false;
+        }
+        if (text.indexOf("http://") === -1 && text.indexOf("https://") === -1) {
+            text = "http://" + text;
+        }
+
+        console.log(text);
+        $.post(domain + "/config/update/preset/" + current + "?src=" + text, {}, function (result) {
+            if (result === "SUCCESS") {
+                $("#iframe" + current).attr("src", text);
+                $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");
+                config[current] = text;
+            }
+        });
+        editModal.modal("hide");
+    }
+
+    // 模态框关闭事件
+    $(function() {
+        $('#editModal').on('hide.bs.modal',
+            function() {
+                hideSpan();
+            })
+    });
+
+    // 隐藏错误警告
+    function hideSpan() {
+        $("#forbiddenSpan").hide();
+    }
+
+    // 全屏
+    function fullScreen() {
+        console.log("fullScreen: " + current);
+        isFullScreen = true;
+        let divIframe = $("#divIframe" + current);
+        let iframe = $("#iframe" + current);
+        divIframe.attr("class", "div-max");
+        divIframe.css({"width":window.innerWidth, "height":window.innerHeight});
+        iframe.attr("class", "iframe-max");
+        iframe.css({"width":window.innerWidth, "height":window.innerHeight});
+        $("#divRestore").show();
+    }
+
+    // 刷新
+    function refresh() {
+        $("#iframe" + current).attr("src", config[current]);
+
+    }
+
+    // 还原
+    function restore() {
+        console.log("restore: " + current);
+        isFullScreen = false;
+        $("#divRestore").hide();
+        $("#iframe" + current).attr("class", "iframe-cell");
+        $("#divIframe" + current).attr("class", "div-iframe");
+        adaptCell();
+    }
+</script>
+
+<div class="div-frames">
+    <div id="divIframe1" class="div-iframe">
+        <iframe id="iframe1" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe2" class="div-iframe">
+        <iframe id="iframe2" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe3" class="div-iframe">
+        <iframe id="iframe3" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe4" class="div-iframe">
+        <iframe id="iframe4" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe5" class="div-iframe">
+        <iframe id="iframe5" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe6" class="div-iframe">
+        <iframe id="iframe6" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe7" class="div-iframe">
+        <iframe id="iframe7" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe8" class="div-iframe">
+        <iframe id="iframe8" class="iframe-cell" src=""></iframe>
+    </div>
+    <div id="divIframe9" class="div-iframe">
+        <iframe id="iframe9" class="iframe-cell" src=""></iframe>
+    </div>
+</div>
+
+<div class="div-covers">
+    <div id="div1" class="div-cell">
+        <div id="cover1" class="div-cover"></div>
+        <div id="bar1" class="div-bar">
+            <span id="span1"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div2" class="div-cell">
+        <div id="cover2" class="div-cover"></div>
+        <div id="bar2" class="div-bar">
+            <span id="span2"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div3" class="div-cell">
+        <div id="cover3" class="div-cover"></div>
+        <div id="bar3" class="div-bar">
+            <span id="span3"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div4" class="div-cell">
+        <div id="cover4" class="div-cover"></div>
+        <div id="bar4" class="div-bar">
+            <span id="span4"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div5" class="div-cell">
+        <div id="cover5" class="div-cover"></div>
+        <div id="bar5" class="div-bar">
+            <span id="span5"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div6" class="div-cell">
+        <div id="cover6" class="div-cover"></div>
+        <div id="bar6" class="div-bar">
+            <span id="span6"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div7" class="div-cell">
+        <div id="cover7" class="div-cover"></div>
+        <div id="bar7" class="div-bar">
+            <span id="span7"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div8" class="div-cell">
+        <div id="cover8" class="div-cover"></div>
+        <div id="bar8" class="div-bar">
+            <span id="span8"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+
+    <div id="div9" class="div-cell">
+        <div id="cover9" class="div-cover"></div>
+        <div id="bar9" class="div-bar">
+            <span id="span9"></span>
+            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑模态框 -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="top: 25%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="editModalLabel">编辑</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-footer">
+                <input id="input1" type="text" class="form-control" placeholder="请输入" onfocus="hideSpan()"/>
+                <span id="forbiddenSpan" style="color: red;display: none">请输入正确的地址！</span>
+                <button type="button" class="btn btn-primary" onclick="save()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 悬浮按钮 -->
+<div id="divRestore" class="div-restore" style="cursor: pointer" onclick="restore()">
+    <i class="fa fa-angle-double-left" style="color: white;margin-top: 6px; margin-left: 3px"></i>
+    <span style="color: white;">返回</span>
+    <!--    <i class="fa fa-question-circle-o" style="color: white;margin-top: 6px; margin-left: 18px" title="帮助"-->
+    <!--       data-toggle="popover" data-container="body" data-placement="left" data-content="左侧的 Popover 中的一些内容"></i>-->
+</div>
+</body>
+</html>

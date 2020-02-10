@@ -1,0 +1,10 @@
+amount=9
+frame1=http://www.baidu.com
+frame2=http://www.baidu.com
+frame3=http://www.google.cn
+frame4=http://www.google.cn
+frame5=http://www.baidu.com
+frame6=http://www.baidu.com
+frame7=http://www.google.cn
+frame8=http://www.google.cn
+frame9=https://176.122.1.1
