@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.cgm</groupId>
-    <artifactId>page-split</artifactId>
+    <artifactId>page-division</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>page-division</name>
     <description>网页分屏</description>

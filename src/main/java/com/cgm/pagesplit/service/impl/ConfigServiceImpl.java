@@ -94,6 +94,11 @@ public class ConfigServiceImpl implements IConfigService {
     }
 
     @Override
+    public String addCustomConfig(PageConfig pageConfig) {
+        return null;
+    }
+
+    @Override
     public String updateCustomConfig(String name, PageConfig pageConfig) {
         return null;
     }
@@ -162,9 +167,5 @@ public class ConfigServiceImpl implements IConfigService {
         OutputStream outputStream = new FileOutputStream(PRESET_CONFIG_FILE);
         properties.store(outputStream, null);
         outputStream.close();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(System.getProperty("user.home"));
     }
 }

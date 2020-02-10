@@ -31,20 +31,31 @@ public class ConfigController {
         return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("/query/custom/{name}")
-    public ResponseEntity<PageConfig> queryCustomByName(@PathVariable String name) {
-        return new ResponseEntity<PageConfig>(configService.queryCustomByName(name), HttpStatus.OK);
+    @GetMapping("/query/custom/current")
+    public ResponseEntity<PageConfig> queryCustomByName() {
+        return new ResponseEntity<PageConfig>(configService.queryCustomByName("配置1"), HttpStatus.OK);
     }
 
-    @PostMapping("/update/custom/{name}/src/{index}")
-    public ResponseEntity<String> updateCustomSrc(@PathVariable String name, @PathVariable int index, @RequestParam String src) {
-        String result = configService.updateCustomSrc(name, index, src);
+    @GetMapping("/query/custom")
+    public ResponseEntity<PageConfig> queryCustomByName(@RequestParam String configName) {
+        return new ResponseEntity<PageConfig>(configService.queryCustomByName(configName), HttpStatus.OK);
+    }
+
+    @PostMapping("/update/custom/src")
+    public ResponseEntity<String> updateCustomSrc(@RequestParam String configName, @RequestParam int index, @RequestParam String src) {
+        String result = configService.updateCustomSrc(configName, index, src);
         return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("/update/custom/{name}")
-    public ResponseEntity<String> updateCustomConfig(@PathVariable String name, @RequestBody PageConfig pageConfig) {
-        String result = configService.updateCustomConfig(name, pageConfig);
+    @PostMapping("/add/custom")
+    public ResponseEntity<String> addCustomConfig(@RequestBody PageConfig pageConfig) {
+        String result = configService.addCustomConfig(pageConfig);
+        return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/update/custom")
+    public ResponseEntity<String> updateCustomConfig(@RequestParam String configName, @RequestBody PageConfig pageConfig) {
+        String result = configService.updateCustomConfig(configName, pageConfig);
         return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
     }
 }

@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<style type="text/css">
+
+</style>
+<html lang="zh-cn">
+<head>
+    <title>自定义配置</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="icon" href="./img/icon.png" >
+    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/popper.js" type="text/javascript"></script>
+    <script src="js/bootstrap.min.js" type="text/javascript"></script>
+</head>
+<body>
+<script type="text/javascript">
+    const domain = "http://127.0.0.1:8090";
+
+    function save() {
+        let config = {};
+        config.configName = $("#configName").val();
+        let divXY = $("#divXY").val();
+        if (divXY.indexOf("*") > -1) {
+            config.divX = divXY.split("*")[0];
+            config.divY = divXY.split("*")[1];
+        } else if (divXY.indexOf("×") > -1) {
+            config.divX = divXY.split("×")[0];
+            config.divY = divXY.split("×")[1];
+        }
+        config.list = [];
+        for (let i = 1; i < 5; i ++) {
+            let cellConfig = {};
+            cellConfig.index = i;
+            cellConfig.src = $("#src" + i).val();
+            let scope = $("#cell" + i).val();
+
+            let scopeFrom = scope;
+            let scopeEnd = scope;
+            if (scope.indexOf(",") > 0) {
+                scopeFrom = scope.split(",")[0];
+                scopeEnd = scope.split(",")[1];
+            }
+            cellConfig.fromX = (scopeFrom - 1) % config.divX + 1;
+            cellConfig.fromY = (scopeFrom + config.divX - 1) / config.divX;
+            cellConfig.endX = (scopeEnd - 1) % config.divX + 1;
+            cellConfig.endY = (scopeEnd + config.divX - 1) / config.divX;
+
+            config.list.push(cellConfig);
+        }
+
+        $.ajax({
+            url:domain + "/config/add/custom",
+            type:"POST",
+            data:JSON.stringify(config),
+            contentType:"application/json; charset=utf-8",
+            dataType:"json",
+            success: function(result){
+                console.log(result);
+            }});
+    }
+
+</script>
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-2 column">
+        </div>
+        <div class="col-md-8 column">
+            <form class="form-horizontal" role="form">
+                <h4>基本设置</h4>
+                <div class="form-group">
+                    <label for="configName" class="col-sm-2 control-label">配置名称</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="configName"
+                               placeholder="请输入名称">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="divXY" class="col-sm-2 control-label">基本布局</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="divXY"
+                               placeholder="最大 4*2 或 3*3">
+                    </div>
+                </div>
+                <h4>单元格配置</h4>
+                <div class="form-group">
+                    <label for="cell1" class="col-sm-2 control-label">单元格1</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="cell1"
+                               placeholder="请输入范围">
+                    </div>
+                    <label for="src1" class="col-sm-2 control-label">地址</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="src1"
+                               placeholder="请输入地址">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="cell2" class="col-sm-2 control-label">单元格2</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" id="cell2"
+                               placeholder="请输入范围">
+                    </div>
+                    <label for="src2" class="col-sm-2 control-label">地址</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" id="src2"
+                               placeholder="请输入地址">
+                    </div>
+                </div><div class="form-group">
+                <label for="cell3" class="col-sm-2 control-label">单元格3</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="cell3"
+                           placeholder="请输入范围">
+                </div>
+                <label for="src3" class="col-sm-2 control-label">地址</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="src3"
+                           placeholder="请输入地址">
+                </div>
+            </div><div class="form-group">
+                <label for="cell4" class="col-sm-2 control-label">单元格4</label>
+                <div class="col-sm-2">
+                    <input type="text" class="form-control" id="cell4"
+                           placeholder="请输入范围">
+                </div>
+                <label for="src4" class="col-sm-2 control-label">地址</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="src4"
+                           placeholder="请输入地址">
+                </div>
+            </div>
+            </form>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button onclick="save()" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2 column">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

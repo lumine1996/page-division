@@ -39,6 +39,13 @@ public interface IConfigService {
     String updateCustomSrc(String name, int index, String src);
 
     /**
+     * 新建自定义配置
+     * @param pageConfig 配置
+     * @return 是否成功（SUCCESS/FAILED）
+     */
+    String addCustomConfig(PageConfig pageConfig);
+
+    /**
      * 修改自定义配置
      * @param name 配置名称
      * @param pageConfig 配置

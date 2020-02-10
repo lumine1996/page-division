@@ -165,7 +165,7 @@
 
         // 获取配置
         $.ajaxSettings.async = false;
-        $.get(domain + "/config/query/custom/配置1", function(data){
+        $.get(domain + "/config/query/custom/current", function(data){
             console.log(data);
             config = data;
         });
@@ -302,7 +302,8 @@
         }
 
         console.log(text);
-        $.post(domain + "/config/update/preset/" + current + "?src=" + text, {}, function (result) {
+        let url = "/config/update/custom/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
+        $.post(domain + url, {}, function (result) {
             if (result === "SUCCESS") {
                 $("#iframe" + current).attr("src", text);
                 $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");
