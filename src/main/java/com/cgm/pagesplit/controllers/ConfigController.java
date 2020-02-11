@@ -49,18 +49,18 @@ public class ConfigController {
     @PostMapping("/update/custom/src")
     public ResponseEntity<String> updateCustomSrc(@RequestParam String configName, @RequestParam int index, @RequestParam String src) {
         String result = configService.updateCustomSrc(configName, index, src);
-        return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/add/custom")
     public ResponseEntity<String> addCustomConfig(@RequestBody PageConfig pageConfig) {
         String result = configService.addCustomConfig(pageConfig);
-        return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/update/custom")
     public ResponseEntity<String> updateCustomConfig(@RequestParam String configName, @RequestBody PageConfig pageConfig) {
         String result = configService.updateCustomConfig(configName, pageConfig);
-        return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
