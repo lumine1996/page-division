@@ -69,6 +69,21 @@ public class ConfigServiceImpl implements IConfigService {
     }
 
     @Override
+    public List<String> queryCustomList() {
+        String[] fileArray = new File(USER_CONFIG_PATH).list();
+        List<String> customList = new ArrayList<>();
+        if (fileArray == null) {
+            return customList;
+        }
+        for (String fileName : fileArray) {
+            if (fileName.endsWith(".json")) {
+                customList.add(fileName.replace(".json", ""));
+            }
+        }
+        return customList;
+    }
+
+    @Override
     public PageConfig queryCustomByName(String name) {
         String json = JsonUtils.readJsonFile(USER_CONFIG_PATH + name);
         PageConfig pageConfig = JSON.parseObject(json, PageConfig.class);
@@ -95,12 +110,28 @@ public class ConfigServiceImpl implements IConfigService {
 
     @Override
     public String addCustomConfig(PageConfig pageConfig) {
-        return null;
+        List<String> configList = queryCustomList();
+        if (configList.contains(pageConfig.getConfigName())) {
+            return "EXISTED";
+        }
+
+        // 新增文件
+        String jsonStr = JSONObject.toJSONString(pageConfig);
+        JsonUtils.writeJsonFile(USER_CONFIG_PATH + pageConfig.getConfigName(), jsonStr);
+        return "SUCCESS";
     }
 
     @Override
     public String updateCustomConfig(String name, PageConfig pageConfig) {
-        return null;
+        List<String> configList = queryCustomList();
+        if (configList.contains(pageConfig.getConfigName())) {
+            return "NOT EXISTED";
+        }
+
+        // 覆盖文件
+        String jsonStr = JSONObject.toJSONString(pageConfig);
+        JsonUtils.writeJsonFile(USER_CONFIG_PATH + pageConfig.getConfigName(), jsonStr);
+        return "SUCCESS";
     }
 
 

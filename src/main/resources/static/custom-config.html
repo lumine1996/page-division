@@ -18,6 +18,20 @@
 <script type="text/javascript">
     const domain = "http://127.0.0.1:8090";
 
+    let configList;
+
+    $(function(){
+        $.get(domain + "/config/query/custom/list", function(data){
+            console.log(data);
+            configList = data;
+            for (let i = 0; i < configList.length; i++) {
+                console.log(configList[i]);
+                let liHtml = "<li><a href=\"/custom.html?configName=name\">name</a></li>";
+                $("#ulMenu").append(liHtml.replace(/name/g, configList[i]));
+            }
+        });
+    });
+
     function save() {
         let config = {};
         config.configName = $("#configName").val();
@@ -36,16 +50,12 @@
             cellConfig.src = $("#src" + i).val();
             let scope = $("#cell" + i).val();
 
-            let scopeFrom = scope;
-            let scopeEnd = scope;
+            cellConfig.upperLeft = scope;
+            cellConfig.lowerRight = scope;
             if (scope.indexOf(",") > 0) {
-                scopeFrom = scope.split(",")[0];
-                scopeEnd = scope.split(",")[1];
+                cellConfig.upperLeft = scope.split(",")[0];
+                cellConfig.lowerRight = scope.split(",")[1];
             }
-            cellConfig.fromX = (scopeFrom - 1) % config.divX + 1;
-            cellConfig.fromY = (scopeFrom + config.divX - 1) / config.divX;
-            cellConfig.endX = (scopeEnd - 1) % config.divX + 1;
-            cellConfig.endY = (scopeEnd + config.divX - 1) / config.divX;
 
             config.list.push(cellConfig);
         }
@@ -64,9 +74,31 @@
 </script>
 <div class="container">
     <div class="row clearfix">
-        <div class="col-md-2 column">
+        <div class="col-md-12 column">
+            <nav class="navbar navbar-default" role="navigation">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">配置中心</a>
+                </div>
+
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active">
+                            <a href="#">Link</a>
+                        </li>
+                        <li>
+                            <a href="#">Link</a>
+                        </li>
+                    </ul>
+                </div>
+
+            </nav>
         </div>
-        <div class="col-md-8 column">
+        <div class="col-md-3 column">
+            <ul class="nav nav-pills nav-stacked" id="ulMenu">
+                <li class="active" id="liAdd"><a href="#">新建</a></li>
+            </ul>
+        </div>
+        <div class="col-md-9 column">
             <form class="form-horizontal" role="form">
                 <h4>基本设置</h4>
                 <div class="form-group">
@@ -136,8 +168,6 @@
                     <button onclick="save()" class="btn btn-primary">保存</button>
                 </div>
             </div>
-        </div>
-        <div class="col-md-2 column">
         </div>
     </div>
 </div>

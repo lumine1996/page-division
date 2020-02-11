@@ -7,10 +7,8 @@ public class CellConfig {
     private Integer index;
     private String title;
     private String src;
-    private Integer fromX;
-    private Integer fromY;
-    private Integer endX;
-    private Integer endY;
+    private Integer upperLeft;
+    private Integer lowerRight;
 
     public Integer getIndex() {
         return index;
@@ -36,35 +34,19 @@ public class CellConfig {
         this.src = src;
     }
 
-    public Integer getFromX() {
-        return fromX;
+    public Integer getUpperLeft() {
+        return upperLeft;
     }
 
-    public void setFromX(Integer fromX) {
-        this.fromX = fromX;
+    public void setUpperLeft(Integer upperLeft) {
+        this.upperLeft = upperLeft;
     }
 
-    public Integer getFromY() {
-        return fromY;
+    public Integer getLowerRight() {
+        return lowerRight;
     }
 
-    public void setFromY(Integer fromY) {
-        this.fromY = fromY;
-    }
-
-    public Integer getEndX() {
-        return endX;
-    }
-
-    public void setEndX(Integer endX) {
-        this.endX = endX;
-    }
-
-    public Integer getEndY() {
-        return endY;
-    }
-
-    public void setEndY(Integer endY) {
-        this.endY = endY;
+    public void setLowerRight(Integer lowerRight) {
+        this.lowerRight = lowerRight;
     }
 }

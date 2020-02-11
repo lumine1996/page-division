@@ -165,10 +165,19 @@
 
         // 获取配置
         $.ajaxSettings.async = false;
-        $.get(domain + "/config/query/custom/current", function(data){
-            console.log(data);
-            config = data;
-        });
+        let href = window.location.href;
+        if (href.indexOf("?") !== -1) {
+            let configName = href.split("=")[1];
+            $.get(domain + "/config/query/custom?configName=" + configName, function(data){
+                console.log(data);
+                config = data;
+            });
+        } else {
+            $.get(domain + "/config/query/custom/current", function(data){
+                console.log(data);
+                config = data;
+            });
+        }
         // 改回异步请求
         $.ajaxSettings.async = true;
 
@@ -188,7 +197,7 @@
             "    </div>";
 
         for (let i = 1; i <= config.list.length; i++) {
-            console.log("Processing " + i + "\n" + config.list[i]);
+            console.log("Processing " + i + "\n" + config.list[i - 1]);
             $("#divFrames").append(replaceNum(divFrameHtml, i));
             $("#divCovers").append(replaceNum(divCoverHtml, i));
             $("#iframe" + i).attr("src", config.list[i - 1].src);
@@ -248,23 +257,29 @@
     }
     
     function adaptOne(i) {
-        console.log("adapting: " + current);
-        let singleConfig = config.list[i - 1];
+        console.log("adapting: " + i);
+        let cellConfig = config.list[i - 1];
+        let fromX = (cellConfig.upperLeft - 1) % config.divX;
+        let fromY = parseInt((cellConfig.upperLeft + config.divX - 1) / config.divX) - 1;
+        let endX = (cellConfig.lowerRight - 1) % config.divX + 1;
+        let endY = parseInt((cellConfig.lowerRight + config.divX - 1) / config.divX);
+        console.log(fromX, fromY, endX, endY);
+
         let innerHeight = window.innerHeight;
         let innerWidth = window.innerWidth;
-        let cosX = singleConfig.endX - singleConfig.fromX;
-        let cosY = singleConfig.endY - singleConfig.fromY;
+        let cosX = endX - fromX;
+        let cosY = endY - fromY;
         let unitHeight = innerHeight / config.divY;
         let unitWidth = innerWidth / config.divX;
-        let cellHeight = unitHeight * cosX;
-        let cellWidth = unitWidth * cosY;
-        $("#divCell" + i).css({"height":cellHeight, "width":cellWidth, "left":singleConfig.fromX * unitWidth, "top":singleConfig.fromY * unitHeight});
-        $("#divIframe" + i).css({"height":cellHeight, "width":cellWidth, "left":singleConfig.fromX * unitWidth, "top":singleConfig.fromY * unitHeight});
+        let cellHeight = unitHeight * cosY;
+        let cellWidth = unitWidth * cosX;
+        $("#divCell" + i).css({"height":cellHeight, "width":cellWidth, "left":fromX * unitWidth, "top":fromY * unitHeight});
+        $("#divIframe" + i).css({"height":cellHeight, "width":cellWidth, "left":fromX * unitWidth, "top":fromY * unitHeight});
         $("#cover" + i).css({"height":cellHeight - 24, "width":cellWidth});
         $("#bar" + i).css({"height":24, "width":cellWidth});
         let scale = 1 / config.divX * cosX;
         $("#iframe" + i).css({"width":innerWidth - config.divX,
-            "height":innerHeight * config.divX / config.divY - config.divX,
+            "height":innerHeight * cosY / cosX - config.divX,
             "-ms-zoom": 1 / cosX,
             "-moz-transform":"scale(" + scale  + ")",
             "-o-transform":"scale(" + scale  + ")",

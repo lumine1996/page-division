@@ -23,6 +23,13 @@ public interface IConfigService {
      */
     String updateConfig(int index, String value);
 
+
+    /**
+     * 查询自定义配置列表
+     * @return 字符串列表
+     */
+    List<String> queryCustomList();
+
     /** 根据配置名称查询配置详情
      * @param name 配置名称
      * @return 配置详情
