@@ -2,74 +2,27 @@ package com.cgm.pagesplit.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cgm.pagesplit.entity.GlobalConfig;
 import com.cgm.pagesplit.entity.PageConfig;
 import com.cgm.pagesplit.service.IConfigService;
 import com.cgm.pagesplit.util.JsonUtils;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * @author cgm
  */
 @Service
 public class ConfigServiceImpl implements IConfigService {
-    private static final String DEFAULT_CONFIG_PATH = "default-config.txt";
     private static final String USER_CONFIG_PATH = System.getProperty("user.home") + "/PageSplit/";
-    private static final String PRESET_CONFIG_FILE = USER_CONFIG_PATH + "preset-config.txt";
+    private static final String GLOBAL_CONFIG_NAME = "global";
+    private static final String GLOBAL_CONFIG_FILE = USER_CONFIG_PATH + "global.json";
 
     @Override
-    public List<String> getConfigList() {
-        List<String> configList = new ArrayList<>();
-        Properties properties = loadProperties();
-        if (properties == null) {
-            return configList;
-        }
-
-        // 填充结果列表
-        configList.add(properties.getProperty("amount"));
-        String url;
-        int index = 1;
-        do {
-            url = properties.getProperty("frame" + index);
-            index ++;
-            configList.add(url);
-        } while (!StringUtils.isEmpty(url));
-
-        return configList;
-    }
-
-    @Override
-    public String updateConfig(int index, String value) {
-        Properties properties = loadProperties();
-        if (properties == null) {
-            return "FAILED: Failed to load properties";
-        }
-
-        if (index == 0) {
-            properties.setProperty("amount", value);
-        } else {
-            properties.setProperty("frame" + index, value);
-        }
-
-        try {
-            storeProperties(properties);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "FAILED: Failed to store properties";
-        }
-
-        return "SUCCESS";
-    }
-
-    @Override
-    public List<String> queryCustomList() {
+    public List<String> queryList() {
         String[] fileArray = new File(USER_CONFIG_PATH).list();
         List<String> customList = new ArrayList<>();
         if (fileArray == null) {
@@ -80,11 +33,22 @@ public class ConfigServiceImpl implements IConfigService {
                 customList.add(fileName.replace(".json", ""));
             }
         }
+        customList.remove(GLOBAL_CONFIG_NAME);
         return customList;
     }
 
     @Override
-    public PageConfig queryCustomByName(String name) {
+    public PageConfig queryCurrent() {
+        String json = JsonUtils.readJsonFile(GLOBAL_CONFIG_FILE);
+        GlobalConfig globalConfig = JSON.parseObject(json, GlobalConfig.class);
+        if (globalConfig == null) {
+            return new PageConfig();
+        }
+        return queryByName(globalConfig.getCurrentConfig());
+    }
+
+    @Override
+    public PageConfig queryByName(String name) {
         String json = JsonUtils.readJsonFile(USER_CONFIG_PATH + name);
         PageConfig pageConfig = JSON.parseObject(json, PageConfig.class);
         if (pageConfig == null) {
@@ -95,22 +59,8 @@ public class ConfigServiceImpl implements IConfigService {
     }
 
     @Override
-    public String updateCustomSrc(String name, int index, String src) {
-        String jsonStr = JsonUtils.readJsonFile(USER_CONFIG_PATH + name);
-        PageConfig pageConfig = JSON.parseObject(jsonStr, PageConfig.class);
-        if (pageConfig == null) {
-            return "FAILED";
-        }
-        pageConfig.getList().get(index).setSrc(src);
-        jsonStr = JSONObject.toJSONString(pageConfig);
-        JsonUtils.writeJsonFile(USER_CONFIG_PATH + name, jsonStr);
-
-        return "SUCCESS";
-    }
-
-    @Override
-    public String addCustomConfig(PageConfig pageConfig) {
-        List<String> configList = queryCustomList();
+    public String addConfig(PageConfig pageConfig) {
+        List<String> configList = queryList();
         if (configList.contains(pageConfig.getConfigName())) {
             return "EXISTED";
         }
@@ -122,8 +72,8 @@ public class ConfigServiceImpl implements IConfigService {
     }
 
     @Override
-    public String updateCustomConfig(String name, PageConfig pageConfig) {
-        List<String> configList = queryCustomList();
+    public String updateConfig(String name, PageConfig pageConfig) {
+        List<String> configList = queryList();
         if (configList.contains(pageConfig.getConfigName())) {
             return "NOT EXISTED";
         }
@@ -134,69 +84,32 @@ public class ConfigServiceImpl implements IConfigService {
         return "SUCCESS";
     }
 
-
-    /**
-     * 获取Properties封装的配置信息
-     * @return 配置信息
-     */
-    private Properties loadProperties(){
-        // 获取配置文件
-        File configFile = new File(PRESET_CONFIG_FILE);
-        if (!configFile.exists() && !initConfig(configFile)) {
-            return null;
+    @Override
+    public String updateCurrent(String name) {
+        String jsonOld = JsonUtils.readJsonFile(GLOBAL_CONFIG_FILE);
+        GlobalConfig globalConfig = JSON.parseObject(jsonOld, GlobalConfig.class);
+        if (globalConfig == null) {
+            return "FAILED: Failed to read config";
         }
 
-        Properties properties = new Properties();
-        try (InputStream propertyInputStream = new FileInputStream(PRESET_CONFIG_FILE)) {
-            properties.load(propertyInputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("ERROR: Loading '" + PRESET_CONFIG_FILE + "'");
-            return null;
-        }
-        return properties;
+        // 修改当前配置，写文件
+        globalConfig.setCurrentConfig(name);
+        String jsonNew = JSON.toJSONString(globalConfig);
+        JsonUtils.writeJsonFile(GLOBAL_CONFIG_FILE, jsonNew);
+        return "SUCCESS";
     }
 
-
-    /**
-     * 初始化配置
-     * @param configFile 配置文件
-     * @return 是否成功
-     */
-    private Boolean initConfig(File configFile) {
-        try {
-            // 判断父目录是否存在，如果不存在，则创建
-            if (configFile.getParentFile() != null && !configFile.getParentFile().exists()) {
-                configFile.getParentFile().mkdirs();
-            }
-            if (!configFile.createNewFile()) {
-                return false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    @Override
+    public String updateSrc(String name, int index, String src) {
+        String jsonStr = JsonUtils.readJsonFile(USER_CONFIG_PATH + name);
+        PageConfig pageConfig = JSON.parseObject(jsonStr, PageConfig.class);
+        if (pageConfig == null) {
+            return "FAILED";
         }
-        Resource resource = new ClassPathResource(DEFAULT_CONFIG_PATH);
+        pageConfig.getList().get(index).setSrc(src);
+        jsonStr = JSONObject.toJSONString(pageConfig);
+        JsonUtils.writeJsonFile(USER_CONFIG_PATH + name, jsonStr);
 
-        //创建输入输出流
-        try (InputStream in = resource.getInputStream();
-             OutputStream out = new FileOutputStream(configFile)) {
-            byte[] bytes = new byte[1024];
-            int len;
-            while((len = in.read(bytes)) != -1) {
-                out.write(bytes,0, len);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
-
-    private void storeProperties(Properties properties) throws IOException {
-        OutputStream outputStream = new FileOutputStream(PRESET_CONFIG_FILE);
-        properties.store(outputStream, null);
-        outputStream.close();
+        return "SUCCESS";
     }
 }

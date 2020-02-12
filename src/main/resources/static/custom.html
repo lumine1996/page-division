@@ -168,12 +168,16 @@
         let href = window.location.href;
         if (href.indexOf("?") !== -1) {
             let configName = href.split("=")[1];
-            $.get(domain + "/config/query/custom?configName=" + configName, function(data){
+            $.get(domain + "/config/query?configName=" + configName, function(data){
                 console.log(data);
                 config = data;
             });
+            // 记住当前页
+            $.post(domain + "/update/current?configName=" + configName, {}, function(data){
+                console.log(data);
+            });
         } else {
-            $.get(domain + "/config/query/custom/current", function(data){
+            $.get(domain + "/config/query/current", function(data){
                 console.log(data);
                 config = data;
             });
@@ -220,11 +224,6 @@
         });
         editButton.on("mouseout", function () {
             $(this).css({"color":"white"})
-        });
-
-        // 记住当前页
-        $.post(domain + "/config/update/preset/0?src=8", {}, function (result) {
-            console.log(result);
         });
     });
 
@@ -317,7 +316,7 @@
         }
 
         console.log(text);
-        let url = "/config/update/custom/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
+        let url = "/config/update/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
         $.post(domain + url, {}, function (result) {
             if (result === "SUCCESS") {
                 $("#iframe" + current).attr("src", text);

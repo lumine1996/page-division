@@ -136,7 +136,7 @@
         });
 
         // 查询配置，并设置iframe的src及遮盖div的点击事件
-        $.get(domain + "/config/query/preset", function(data){
+        $.get(domain + "/preset/query/list", function(data){
             console.log(data);
             config = data;
             let url;
@@ -148,7 +148,7 @@
         });
 
         // 记住当前页
-        $.post(domain + "/config/update/preset/0?src=8", {}, function (result) {
+        $.post(domain + "/preset/update/0?src=8", {}, function (result) {
             console.log(result);
         });
 
@@ -217,7 +217,7 @@
         }
 
         console.log(text);
-        $.post(domain + "/config/update/preset/" + current + "?src=" + text, {}, function (result) {
+        $.post(domain + "/preset/update/" + current + "?src=" + text, {}, function (result) {
             if (result === "SUCCESS") {
                 $("#iframe" + current).attr("src", text);
                 $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");

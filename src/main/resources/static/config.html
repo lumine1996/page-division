@@ -19,7 +19,7 @@
 </style>
 <html lang="zh-cn">
 <head>
-    <title>自定义配置</title>
+    <title>配置中心</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <link rel="icon" href="./img/icon.png" >
     <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
@@ -39,7 +39,7 @@
     // onload事件
     $(function(){
         $.ajaxSettings.async = false;
-        $.get(domain + "/config/query/custom/list", function(data){
+        $.get(domain + "/config/query/list", function(data){
             console.log(data);
             configList = data;
             for (let i = 0; i < configList.length; i++) {
@@ -47,20 +47,6 @@
                 let seq = i + 1;
                 $("#ulMenu").append("<li><a href='#' id='li" + seq +"' onclick='edit(" + seq +")'>"
                     + configList[i] + "</a></li>");
-            }
-        });
-
-        // 编辑
-        $("li").click(function () {
-            $("li.active").attr("class", "");
-            $(this).attr("class", "active");
-
-            if ($(this).children("a").text() === "新建") {
-                isNew = true;
-                $("#configName").removeAttr("readonly");
-            } else {
-                isNew = false;
-                $("#configName").attr("readonly","readonly");
             }
         });
     });
@@ -133,9 +119,9 @@
             config.list.push(cellConfig);
         }
 
-        let url = domain + "/config/add/custom";
+        let url = domain + "/config/add";
         if (!isNew) {
-            url = domain + "/config/update/custom"
+            url = domain + "/config/update"
         }
         $.ajax({
             url:url,

@@ -19,48 +19,42 @@ public class ConfigController {
     @Resource
     private IConfigService configService;
 
-    @GetMapping("/query/preset")
-    public ResponseEntity<List<String>> queryPreset() {
-        List<String> srcList = configService.getConfigList();
-        return new ResponseEntity<>(srcList, HttpStatus.OK);
+    @GetMapping("/query/list")
+    public ResponseEntity<List<String>> queryList() {
+        return new ResponseEntity<>(configService.queryList(), HttpStatus.OK);
     }
 
-    @PostMapping("/update/preset/{index}")
-    public ResponseEntity<String> updateFrameSrc(@PathVariable int index, @RequestParam String src) {
-        String result = configService.updateConfig(index, src);
-        return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+    @GetMapping("/query/current")
+    public ResponseEntity<PageConfig> queryByName() {
+        return new ResponseEntity<>(configService.queryCurrent(), HttpStatus.OK);
     }
 
-    @GetMapping("/query/custom/list")
-    public ResponseEntity<List<String>> queryCustomList() {
-        return new ResponseEntity<>(configService.queryCustomList(), HttpStatus.OK);
+    @GetMapping("/query")
+    public ResponseEntity<PageConfig> queryByName(@RequestParam String configName) {
+        return new ResponseEntity<>(configService.queryByName(configName), HttpStatus.OK);
     }
 
-    @GetMapping("/query/custom/current")
-    public ResponseEntity<PageConfig> queryCustomByName() {
-        return new ResponseEntity<>(configService.queryCustomByName("配置1"), HttpStatus.OK);
-    }
-
-    @GetMapping("/query/custom")
-    public ResponseEntity<PageConfig> queryCustomByName(@RequestParam String configName) {
-        return new ResponseEntity<>(configService.queryCustomByName(configName), HttpStatus.OK);
-    }
-
-    @PostMapping("/update/custom/src")
-    public ResponseEntity<String> updateCustomSrc(@RequestParam String configName, @RequestParam int index, @RequestParam String src) {
-        String result = configService.updateCustomSrc(configName, index, src);
+    @PostMapping("/add")
+    public ResponseEntity<String> addConfig(@RequestBody PageConfig pageConfig) {
+        String result = configService.addConfig(pageConfig);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/add/custom")
-    public ResponseEntity<String> addCustomConfig(@RequestBody PageConfig pageConfig) {
-        String result = configService.addCustomConfig(pageConfig);
+    @PostMapping("/update")
+    public ResponseEntity<String> updateConfig(@RequestParam String configName, @RequestBody PageConfig pageConfig) {
+        String result = configService.updateConfig(configName, pageConfig);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PostMapping("/update/custom")
-    public ResponseEntity<String> updateCustomConfig(@RequestParam String configName, @RequestBody PageConfig pageConfig) {
-        String result = configService.updateCustomConfig(configName, pageConfig);
+    @PostMapping("/update/current")
+    public ResponseEntity<String> updateCurrent(@RequestParam String configName) {
+        String result = configService.updateCurrent(configName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @PostMapping("/update/src")
+    public ResponseEntity<String> updateSrc(@RequestParam String configName, @RequestParam int index, @RequestParam String src) {
+        String result = configService.updateSrc(configName, index, src);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
