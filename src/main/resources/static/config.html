@@ -51,17 +51,37 @@
         });
     });
 
+    // 新建配置
+    function add() {
+        isNew = true;
+
+        $("li.active").attr("class", "");
+        $("#liAdd").attr("class", "active");
+        $("#configName").removeAttr("readonly");
+        $("input").val("");
+    }
+
+    // 修改已有配置
     function edit(i) {
+        isNew = false;
+
         $("li.active").attr("class", "");
         $("#li" + i).attr("class", "active");
+        $("#configName").attr("readonly","readonly");
+        $("input").val("");
 
-        if (i > 0) {
-            isNew = false;
-            $("#configName").attr("readonly","readonly");
-        } else {
-            isNew = true;
-            $("#configName").removeAttr("readonly");
-        }
+        // 获取配置详情并填充表单
+        $.get(domain + "/config/query?configName=" + configList[i - 1], function(config){
+            console.log(config);
+            $("#configName").val(config.configName);
+            $("#divXY").val(config.divX + "*" + config.divY);
+            let list = config.list;
+            for (let i = 0; i < list.length; i ++) {
+                let seq = i + 1;
+                $("#cell" + seq).val(list[i].upperLeft + "," + list[i].lowerRight);
+                $("#src" + seq).val(list[i].src);
+            }
+        });
     }
 
     // 绘制预览图，布局输入后事件
@@ -137,7 +157,8 @@
                         " onclick='edit(" + configList.length +")'>" + config.configName +
                         "</a></li>");
                 }
-            }});
+            }
+        });
     }
 
 </script>
@@ -164,11 +185,11 @@
         </div>
         <div class="col-md-3 column">
             <ul class="nav nav-pills nav-stacked" id="ulMenu">
-                <li class="active" id="liAdd"><a href="#">新建</a></li>
+                <li class="active" id="liAdd" onclick="add()"><a href="#">新建</a></li>
             </ul>
         </div>
         <div class="col-md-9 column">
-            <form class="form-horizontal" role="form">
+            <form class="form-horizontal" id="configForm" role="form">
                 <h4>基本设置</h4>
                 <div class="col-md-6 column" style="height: 124px">
                     <div class="form-group">

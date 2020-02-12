@@ -173,7 +173,7 @@
                 config = data;
             });
             // 记住当前页
-            $.post(domain + "/update/current?configName=" + configName, {}, function(data){
+            $.post(domain + "/config/update/current?configName=" + configName, {}, function(data){
                 console.log(data);
             });
         } else {
