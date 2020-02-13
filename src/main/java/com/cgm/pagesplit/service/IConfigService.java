@@ -57,4 +57,11 @@ public interface IConfigService {
      * @return 是否成功（SUCCESS/FAILED）
      */
     String updateSrc(String name, int index, String src);
+
+    /**
+     * 删除配置
+     * @param name 配置名称
+     * @return 是否成功（SUCCESS/FAILED）
+     */
+    String deleteConfig(String name);
 }

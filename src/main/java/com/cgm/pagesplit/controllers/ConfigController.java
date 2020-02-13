@@ -57,4 +57,10 @@ public class ConfigController {
         String result = configService.updateSrc(configName, index, src);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteConfig(@RequestParam String configName) {
+        String result = configService.deleteConfig(configName);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
 }

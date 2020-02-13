@@ -112,4 +112,16 @@ public class ConfigServiceImpl implements IConfigService {
 
         return "SUCCESS";
     }
+
+    @Override
+    public String deleteConfig(String name) {
+        File file = new File(USER_CONFIG_PATH + name + ".json");
+        if (file.exists()) {
+            if (file.delete()) {
+                return "SUCCESS";
+            }
+            return "FAILED: Failed to delete file";
+        }
+        return "FAILED: File is not exist";
+    }
 }
