@@ -81,7 +81,7 @@
     .div-restore:hover {
         right: 0;
     }
-    .edit-button {
+    .edit-btn {
         float: right;
         margin-top: 4px;
         margin-right: 10px;
@@ -100,11 +100,10 @@
     <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/popper.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="js/config.js" type="text/javascript"></script>
 </head>
 <body style="margin: 0">
 <script type="text/javascript">
-    // 后端地址
-    const domain = "http://47.100.137.154:8090";
     // 配置数组
     let config;
     // 当前位置
@@ -127,7 +126,7 @@
         divCell.on("mouseout", function () {
             $(this).children().hide();
         });
-        let editButton = $(".edit-button");
+        let editButton = $(".edit-btn");
         editButton.on("mouseover", function () {
             $(this).css({"color":"greenyellow"})
         });
@@ -303,9 +302,9 @@
         <div id="cover1" class="div-cover"></div>
         <div id="bar1" class="div-bar">
             <span id="span1"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -313,9 +312,9 @@
         <div id="cover2" class="div-cover"></div>
         <div id="bar2" class="div-bar">
             <span id="span2"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -323,9 +322,9 @@
         <div id="cover3" class="div-cover"></div>
         <div id="bar3" class="div-bar">
             <span id="span3"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -333,9 +332,9 @@
         <div id="cover4" class="div-cover"></div>
         <div id="bar4" class="div-bar">
             <span id="span4"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -343,9 +342,9 @@
         <div id="cover5" class="div-cover"></div>
         <div id="bar5" class="div-bar">
             <span id="span5"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -353,9 +352,9 @@
         <div id="cover6" class="div-cover"></div>
         <div id="bar6" class="div-bar">
             <span id="span6"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -363,9 +362,9 @@
         <div id="cover7" class="div-cover"></div>
         <div id="bar7" class="div-bar">
             <span id="span7"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 
@@ -373,9 +372,9 @@
         <div id="cover8" class="div-cover"></div>
         <div id="bar8" class="div-bar">
             <span id="span8"></span>
-            <i class="fa fa-arrows-alt edit-button" onclick="fullScreen()"></i>
-            <i class="fa fa-refresh edit-button" onclick="refresh()"></i>
-            <i class="fa fa-pencil edit-button" onclick="edit()"></i>
+            <i class="fa fa-arrows-alt edit-btn" onclick="fullScreen()"></i>
+            <i class="fa fa-refresh edit-btn" onclick="refresh()"></i>
+            <i class="fa fa-pencil edit-btn" onclick="edit()"></i>
         </div>
     </div>
 </div>
@@ -385,12 +384,14 @@
     <div class="modal-dialog" style="top: 25%">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="editModalLabel">编辑</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="editModalLabel">编辑</h4>
             </div>
-            <div class="modal-footer">
+            <div class="modal-body">
                 <input id="input1" type="text" class="form-control" placeholder="请输入" onfocus="hideSpan()"/>
                 <span id="forbiddenSpan" style="color: red;display: none">请输入正确的地址！</span>
+            </div>
+            <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="save()">保存</button>
             </div>
         </div>

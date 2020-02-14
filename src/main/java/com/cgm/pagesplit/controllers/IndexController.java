@@ -1,8 +1,6 @@
 package com.cgm.pagesplit.controllers;
 
-import com.cgm.pagesplit.service.IConfigService;
 import com.cgm.pagesplit.service.IPresetService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -17,12 +15,10 @@ import java.io.IOException;
 public class IndexController {
     @Resource
     private IPresetService presetService;
-    @Resource
-    private IConfigService configService;
 
     @RequestMapping("/")
     public void index(HttpServletResponse response) throws IOException {
-        response.sendRedirect(".html");
+        response.sendRedirect("/custom.html");
     }
 
     @RequestMapping("/config")
@@ -39,15 +35,11 @@ public class IndexController {
 
     @RequestMapping("/8")
     public void indexEight(HttpServletResponse response) throws IOException {
-
         response.sendRedirect("/division8.html");
-
     }
 
     @RequestMapping("/9")
     public void indexNine(HttpServletResponse response) throws IOException {
-
         response.sendRedirect("/division9.html");
-
     }
 }
