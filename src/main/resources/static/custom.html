@@ -203,7 +203,8 @@
             console.log("Processing " + i + "\n" + config.list[i - 1]);
             $("#divFrames").append(replaceNum(divFrameHtml, i));
             $("#divCovers").append(replaceNum(divCoverHtml, i));
-            $("#iframe" + i).attr("src", config.list[i - 1].src);
+
+            refreshSpecify(i);
             adaptOne(i);
         }
 
@@ -289,7 +290,8 @@
     function edit() {
         // current = num;
         $("#editModal").modal("show");
-        $("#input1").val(config[current]);
+        $("#input1").val(config.list[current - 1].src);
+        console.log("edit " + current + ": " +config.list[current - 1].src);
 
     }
 
@@ -299,14 +301,14 @@
         let forbiddenSpan = $("#forbiddenSpan");
         let editModal = $("#editModal");
         // 未修改
-        if (text === config[current]) {
+        if (text === config.list[current - 1].src) {
             editModal.modal("hide");
             return false;
         }
 
         // 格式校验与协议补全
         let regex = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\*\+,;=.]+$/;
-        if (!regex.test(text)) {
+        if (!regex.test(text) && !regex.test(text.replace("proxy:", ""))) {
             forbiddenSpan.show();
             return false;
         }
@@ -318,9 +320,9 @@
         let url = "/config/update/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
         $.post(domain + url, {}, function (result) {
             if (result === "SUCCESS") {
-                $("#iframe" + current).attr("src", text);
+                refreshSpecify(current);
                 $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");
-                config[current] = text;
+                config.list[current - 1].src = text;
             }
         });
         editModal.modal("hide");
@@ -360,10 +362,19 @@
         $("#divRestore").show();
     }
 
-    // 刷新
+    // 刷新当前frame
     function refresh() {
-        $("#iframe" + current).attr("src", config.list[current]);
+        refreshSpecify(current);
+    }
 
+    // 刷新指定frame
+    function refreshSpecify(index) {
+        let url = config.list[index - 1].src;
+        if (url.indexOf("proxy:") === 0) {
+            url = domain + "/proxy/html?url=" + escape(url.replace("proxy:", ""));
+            console.log(url);
+        }
+        $("#iframe" + index).attr("src", url);
     }
 
     // 还原
@@ -395,9 +406,11 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="editModalLabel">编辑</h4>
             </div>
+            <div class="modal-body">
+                <input id="input1" type="text" class="form-control" placeholder="请输入" onfocus="hideSpan()"/>
+                <span id="forbiddenSpan" style="color: red;display: none">请输入正确的地址！</span>
+            </div>
             <div class="modal-footer">
-                <input id="input1" type="text" class="form-control" placeholder="请输入网址" onfocus="hideSpan()"/>
-                <span id="forbiddenSpan" style="color: red;display: none">请输入正确的网址！</span>
                 <button type="button" class="btn btn-primary" onclick="save()">保存</button>
             </div>
         </div>

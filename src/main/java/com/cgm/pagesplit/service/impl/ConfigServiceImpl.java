@@ -2,6 +2,7 @@ package com.cgm.pagesplit.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.cgm.pagesplit.entity.CellConfig;
 import com.cgm.pagesplit.entity.GlobalConfig;
 import com.cgm.pagesplit.entity.PageConfig;
 import com.cgm.pagesplit.service.IConfigService;
@@ -106,7 +107,14 @@ public class ConfigServiceImpl implements IConfigService {
         if (pageConfig == null) {
             return "FAILED";
         }
-        pageConfig.getList().get(index).setSrc(src);
+
+        CellConfig cellConfig = pageConfig.getList().get(index - 1);
+        cellConfig.setSrc(src);
+        List<CellConfig> configList = pageConfig.getList();
+        configList.remove(index - 1);
+        configList.add(index - 1, cellConfig);
+        pageConfig.setList(configList);
+
         jsonStr = JSONObject.toJSONString(pageConfig);
         JsonUtils.writeJsonFile(USER_CONFIG_PATH + name, jsonStr);
 
