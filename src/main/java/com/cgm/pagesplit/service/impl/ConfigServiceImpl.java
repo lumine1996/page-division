@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,6 +36,7 @@ public class ConfigServiceImpl implements IConfigService {
             }
         }
         customList.remove(GLOBAL_CONFIG_NAME);
+        Collections.sort(customList);
         return customList;
     }
 

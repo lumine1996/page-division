@@ -36,6 +36,8 @@
     let isNew = true;
     // 当前页签序号
     let current = 0;
+    // 单元格数量
+    let countCell = 0;
 
     // onload事件
     $(function(){
@@ -60,6 +62,10 @@
         current = 0;
         $("#btnRemove").hide();
 
+        // 清空之前的预览表格
+        let previewTable = $("#previewTable");
+        previewTable.empty();
+        // 处理样式
         $("li.active").attr("class", "");
         $("#menuAdd").attr("class", "active");
         $("#configName").removeAttr("readonly");
@@ -82,10 +88,11 @@
             console.log(config);
             $("#configName").val(config.configName);
             $("#divXY").val(config.divX + "*" + config.divY);
+            drawTable();
             let list = config.list;
             for (let i = 0; i < list.length; i ++) {
                 let seq = i + 1;
-                $("#cell" + seq).val(list[i].upperLeft + "," + list[i].lowerRight);
+                $("#scope" + seq).val(list[i].upperLeft + "," + list[i].lowerRight);
                 $("#src" + seq).val(list[i].src);
             }
         });
@@ -107,13 +114,40 @@
         let divY = handleResult[1];
         let count = 0;
         for (let i = 0; i < divY; i ++) {
-            previewTable.append("<tr id=\"tr" + i + "\">");
+            previewTable.append("<tr id='tr" + i + "'>");
             for (let j = 0; j < divX; j++) {
                 count ++;
                 $("#tr" + i).append("<td>" + count + "</td>")
             }
             previewTable.append("</tr>");
         }
+
+        // 补全或移除单元格配置，使与基本布局数量一致
+        if (count > countCell) {
+            for (let i = countCell + 1; i <= count; i ++) {
+                let cellHtml = `
+                    <div class='form-group' id='cell${i}'>
+                        <label for='scope${i}' class='col-sm-2 control-label'>单元格${i}</label>
+                        <div class='col-sm-2'>
+                            <input type='text' class='form-control' id='scope${i}'
+                                   placeholder='请输入范围'>
+                        </div>
+                        <label for='src${i}' class='col-sm-2 control-label'>地址</label>
+                        <div class='col-sm-6'>
+                            <input type='text' class='form-control' id='src${i}'
+                                   placeholder='请输入地址'>
+                        </div>
+                    </div>
+                `;
+                $("#configForm").append(cellHtml);
+            }
+        }
+        if (count < countCell) {
+            for (let i = count + 1; i <= countCell; i ++) {
+                $("#cell" + i).remove();
+            }
+        }
+        countCell = count;
     }
 
     // 保存
@@ -140,7 +174,7 @@
             let cellConfig = {};
             cellConfig.index = i;
             cellConfig.src = $("#src" + i).val();
-            let scope = $("#cell" + i).val();
+            let scope = $("#scope" + i).val();
             // 未输入时跳过
             if (!scope || !cellConfig.src) {
                 continue;
@@ -162,7 +196,7 @@
             // else 非法数据，不录入
         }
         if (config.list.length < 1) {
-            alert("请填写单元格配置！");
+            myAlert("请填写单元格配置！");
             return false;
         }
 
@@ -179,11 +213,14 @@
             async:false,
             success: function(result){
                 console.log(result);
-                if (result === "SUCCESS") {
+                myAlert(result);
+                if (result === "SUCCESS" && isNew) {
                     configList.push(config.configName);
                     $("#ulMenu").append("<li id='menu" + configList.length + "'><a href='#'"  +
                         " onclick='edit(" + configList.length +")'>" + config.configName +
                         "</a></li>");
+                    $("#dropdown").append("<li id='dropdown'" + configList.length + "'><a href='/custom.html?" +
+                        "configName=" + config.configName + "'>" + config.configName + "</a></li>")
                 }
             }
         });
@@ -243,6 +280,11 @@
     function show(id) {
         $("#" + id).show();
     }
+
+    function myAlert(text) {
+        // Todo 提示框
+        alert(text);
+    }
 </script>
 <div class="container">
     <div class="row clearfix">
@@ -300,52 +342,6 @@
                     <table id="previewTable" border="1" class="table-preview"></table>
                 </div>
                 <h4>单元格配置</h4>
-                <div class="form-group">
-                    <label for="cell1" class="col-sm-2 control-label">单元格1</label>
-                    <div class="col-sm-2">
-                        <input type="text" class="form-control" id="cell1"
-                               placeholder="请输入范围">
-                    </div>
-                    <label for="src1" class="col-sm-2 control-label">地址</label>
-                    <div class="col-sm-6">
-                        <input type="text" class="form-control" id="src1"
-                               placeholder="请输入地址">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="cell2" class="col-sm-2 control-label">单元格2</label>
-                    <div class="col-sm-2">
-                        <input type="text" class="form-control" id="cell2"
-                               placeholder="请输入范围">
-                    </div>
-                    <label for="src2" class="col-sm-2 control-label">地址</label>
-                    <div class="col-sm-6">
-                        <input type="text" class="form-control" id="src2"
-                               placeholder="请输入地址">
-                    </div>
-                </div><div class="form-group">
-                <label for="cell3" class="col-sm-2 control-label">单元格3</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" id="cell3"
-                           placeholder="请输入范围">
-                </div>
-                <label for="src3" class="col-sm-2 control-label">地址</label>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" id="src3"
-                           placeholder="请输入地址">
-                </div>
-            </div><div class="form-group">
-                <label for="cell4" class="col-sm-2 control-label">单元格4</label>
-                <div class="col-sm-2">
-                    <input type="text" class="form-control" id="cell4"
-                           placeholder="请输入范围">
-                </div>
-                <label for="src4" class="col-sm-2 control-label">地址</label>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" id="src4"
-                           placeholder="请输入地址">
-                </div>
-            </div>
             </form>
             <div class="form-group">
                 <div class="col-sm-12">
