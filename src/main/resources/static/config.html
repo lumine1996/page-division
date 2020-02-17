@@ -48,6 +48,8 @@
                 let seq = i + 1;
                 $("#ulMenu").append("<li id='menu" + seq +"'><a href='#' onclick='edit(" + seq +")'>"
                     + configList[i] + "</a></li>");
+                $("#dropdown").append("<li id='dropdown'" + seq + "'><a href='/custom.html?configName=" + configList[i]
+                    + "'>" + configList[i] + "</a></li>")
             }
         });
     });
@@ -130,7 +132,7 @@
             return false;
         }
         config.divX = handleResult[0];
-        config.divX = handleResult[1];
+        config.divY = handleResult[1];
 
         // 单元格处理
         config.list = [];
@@ -147,11 +149,17 @@
             if (!isNaN(scope)) {
                 cellConfig.upperLeft = scope;
                 cellConfig.lowerRight = scope;
+                config.list.push(cellConfig);
             }else if (scope.indexOf(",") > 0) {
-                cellConfig.upperLeft = scope.split(",")[0];
-                cellConfig.lowerRight = scope.split(",")[1];
+                let upperLeft = scope.split(",")[0];
+                let lowerRight = scope.split(",")[1];
+                if (!isNaN(upperLeft) && !isNaN(lowerRight)) {
+                    cellConfig.upperLeft = upperLeft;
+                    cellConfig.lowerRight = lowerRight;
+                    config.list.push(cellConfig);
+                }
             }
-            config.list.push(cellConfig);
+            // else 非法数据，不录入
         }
         if (config.list.length < 1) {
             alert("请填写单元格配置！");
@@ -159,9 +167,9 @@
         }
 
         // 接口调用
-        let url = domain + "/config/add";
+        let url = domain + "/config/add?configName=" + config.configName;
         if (!isNew) {
-            url = domain + "/config/update"
+            url = domain + "/config/update?configName=" + config.configName;
         }
         $.ajax({
             url:url,
@@ -197,6 +205,7 @@
             success: function(result){
                 console.log(result);
                 $("#menu" + current).remove();
+                $("#dropdown" + current).remove();
                 add();
             }
         });

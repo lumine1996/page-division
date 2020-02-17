@@ -75,7 +75,7 @@ public class ConfigServiceImpl implements IConfigService {
     @Override
     public String updateConfig(String name, PageConfig pageConfig) {
         List<String> configList = queryList();
-        if (configList.contains(pageConfig.getConfigName())) {
+        if (!configList.contains(pageConfig.getConfigName())) {
             return "NOT EXISTED";
         }
 

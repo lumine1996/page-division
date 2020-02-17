@@ -18,12 +18,17 @@ public class IndexController {
 
     @RequestMapping("/")
     public void index(HttpServletResponse response) throws IOException {
-        response.sendRedirect("/custom.html");
+        response.sendRedirect("/config.html");
     }
 
     @RequestMapping("/config")
     public void config(HttpServletResponse response) throws IOException {
         response.sendRedirect("/config.html");
+    }
+
+    @RequestMapping("/custom")
+    public void custom(HttpServletResponse response) throws IOException {
+        response.sendRedirect("/custom.html");
     }
 
     @RequestMapping("/preset")
