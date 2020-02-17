@@ -38,6 +38,16 @@
     let current = 0;
     // 单元格数量
     let countCell = 0;
+    // 横向数量
+    let divX;
+    // 纵向数量
+    let divY;
+    // 填充色
+    let colors = ['#bb88ff', '#ff8888',
+        '#ffbb88', '#f0f088',
+        '#bbffbb', '#6666ff',
+        '#88ffff', '#ff88ff',
+        '#8888ff', '#bbbb88'];
 
     // onload事件
     $(function(){
@@ -62,9 +72,15 @@
         current = 0;
         $("#btnRemove").hide();
 
-        // 清空之前的预览表格
+        // 清空之前的预览表格及单元格配置
         let previewTable = $("#previewTable");
         previewTable.empty();
+        for (let i = 1; i <= countCell; i ++) {
+            $("#cell" + i).remove();
+        }
+        countCell = 0;
+        $("#header2").hide();
+
         // 处理样式
         $("li.active").attr("class", "");
         $("#menuAdd").attr("class", "active");
@@ -95,6 +111,7 @@
                 $("#scope" + seq).val(list[i].upperLeft + "," + list[i].lowerRight);
                 $("#src" + seq).val(list[i].src);
             }
+            fillAll();
         });
     }
 
@@ -106,30 +123,30 @@
         previewTable.empty();
 
         // 先校验，校验通过后重新绘制表格
-        let handleResult = handleDivXY();
-        if (!handleResult) {
+        if (!handleDivXY()) {
             return false;
         }
-        let divX = handleResult[0];
-        let divY = handleResult[1];
+
         let count = 0;
         for (let i = 0; i < divY; i ++) {
-            previewTable.append("<tr id='tr" + i + "'>");
+            previewTable.append(`<tr id='tr${i}'>`);
             for (let j = 0; j < divX; j++) {
                 count ++;
-                $("#tr" + i).append("<td>" + count + "</td>")
+                $("#tr" + i).append(`<td id='td${count}'>${count}</td>`)
             }
-            previewTable.append("</tr>");
+            previewTable.append(`</tr>`);
         }
+        $("#header2").show();
+        console.log("before: " + countCell + ", after: " + count);
 
         // 补全或移除单元格配置，使与基本布局数量一致
         if (count > countCell) {
             for (let i = countCell + 1; i <= count; i ++) {
                 let cellHtml = `
                     <div class='form-group' id='cell${i}'>
-                        <label for='scope${i}' class='col-sm-2 control-label'>单元格${i}</label>
+                        <label for='scope${i}' class='col-sm-2 control-label'>单元格${i} <span  style='color: ${colors[i]}'>▉</span></label>
                         <div class='col-sm-2'>
-                            <input type='text' class='form-control' id='scope${i}'
+                            <input type='text' class='form-control' id='scope${i}' onchange='fillAll()'
                                    placeholder='请输入范围'>
                         </div>
                         <label for='src${i}' class='col-sm-2 control-label'>地址</label>
@@ -161,12 +178,11 @@
         }
 
         // 基本布局校验及赋值
-        let handleResult = handleDivXY();
-        if (!handleResult) {
+        if (!handleDivXY()) {
             return false;
         }
-        config.divX = handleResult[0];
-        config.divY = handleResult[1];
+        config.divX = divX;
+        config.divY = divY;
 
         // 单元格处理
         config.list = [];
@@ -257,8 +273,6 @@
             return false;
         }
 
-        let divX;
-        let divY;
         if (divXY.indexOf("*") > -1) {
             divX = parseInt(divXY.split("*")[0]);
             divY = parseInt(divXY.split("*")[1]);
@@ -271,19 +285,72 @@
             $("#divXYError").show();
             return false;
         }
-        return [divX, divY];
+        return true;
     }
 
     function hide(id) {
         $("#" + id).hide();
     }
-    function show(id) {
-        $("#" + id).show();
-    }
 
+    // 提示框
     function myAlert(text) {
         // Todo 提示框
         alert(text);
+    }
+
+    function fillAll() {
+        for (let i = 1; i <= countCell; i ++) {
+            fillOne(i);
+        }
+
+    }
+
+    // 表格上色
+    function fillOne(num) {
+        let scope = $("#scope" + num).val();
+        console.log("filling " + scope);
+        // 单数字
+        if (!isNaN(scope)) {
+            $("#td" + scope).attr("bgcolor", colors[num]);
+        }else if (scope.indexOf(",") < 0) {
+            return false;
+        }
+
+        // 范围校验
+        let upperLeft = scope.split(",")[0];
+        let lowerRight = scope.split(",")[1];
+        if (isNaN(upperLeft) || isNaN(lowerRight)) {
+            // 两个元素不全为数字
+            console.log("两个元素不全为数字");
+            return false;
+        }
+        upperLeft = parseInt(upperLeft);
+        lowerRight = parseInt(lowerRight);
+        if (upperLeft < 0 || upperLeft > countCell || upperLeft > lowerRight || lowerRight > countCell) {
+            // 范围错误
+            console.log("范围错误");
+            return false;
+        }
+        if ((upperLeft - 1) % divX > (lowerRight - 1) % divX) {
+            // 无法组成矩形
+            console.log("无法组成矩形");
+            return false;
+        }
+
+        // 上色
+        let fromX = (upperLeft - 1) % divX;
+        let fromY = parseInt((upperLeft + divX - 1) / divX) - 1;
+        let endX = (lowerRight - 1) % divX + 1;
+        let endY = parseInt((lowerRight + divX - 1) / divX);
+        console.log(upperLeft, lowerRight, divX, divY);
+        console.log(fromX, fromY, endX, endY);
+        for (let i = fromX; i < endX; i++) {
+            for (let j = fromY; j < endY; j++) {
+                let seq = (i + 1) + j * divX;
+                $("#td" + seq).attr("bgcolor", colors[num]);
+            }
+        }
+
     }
 </script>
 <div class="container">
@@ -341,7 +408,7 @@
                 <div class="col-md-6 column" style="height: 124px">
                     <table id="previewTable" border="1" class="table-preview"></table>
                 </div>
-                <h4>单元格配置</h4>
+                <h4 id="header2" style="display: none">单元格配置</h4>
             </form>
             <div class="form-group">
                 <div class="col-sm-12">

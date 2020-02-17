@@ -100,58 +100,6 @@
 <script type="text/javascript">
     // 配置数组
     let config;
-    // let config = {
-    //     name: "",
-    //     divX: 4,
-    //     divY: 2,
-    //     list: [
-    //         {
-    //             index: 1,
-    //             title: "title1",
-    //             src: "http://www.baidu.com",
-    //             fromX: 0,
-    //             fromY: 0,
-    //             endX: 1,
-    //             endY: 1
-    //         },
-    //         {
-    //             index: 2,
-    //             title: "title2",
-    //             src: "https://www.biosino.org",
-    //             fromX: 0,
-    //             fromY: 1,
-    //             endX: 1,
-    //             endY: 2
-    //         },
-    //         {
-    //             index: 3,
-    //             title: "title3",
-    //             src: "http://www.baidu.com",
-    //             fromX: 1,
-    //             fromY: 0,
-    //             endX: 3,
-    //             endY: 2
-    //         },
-    //         {
-    //             index: 4,
-    //             title: "title4",
-    //             src: "http://www.baidu.com",
-    //             fromX: 3,
-    //             fromY: 0,
-    //             endX: 4,
-    //             endY: 1
-    //         },
-    //         {
-    //             index: 4,
-    //             src: "http://www.baidu.com",
-    //             title: "title4",
-    //             fromX: 3,
-    //             fromY: 1,
-    //             endX: 4,
-    //             endY: 2
-    //         }
-    //     ]
-    // };
     // 当前位置
     let current = 1;
     // 是否全屏
@@ -212,7 +160,6 @@
         let divCell = $(".div-cell");
         divCell.on("mouseover", function () {
             current = $(this).attr('id').substr(7);
-            console.log("current: " + current);
             $(this).children().show();
         });
         divCell.on("mouseout", function () {
@@ -276,9 +223,9 @@
         $("#divIframe" + i).css({"height":cellHeight, "width":cellWidth, "left":fromX * unitWidth, "top":fromY * unitHeight});
         $("#cover" + i).css({"height":cellHeight - 24, "width":cellWidth});
         $("#bar" + i).css({"height":24, "width":cellWidth});
-        let scale = 1 / config.divX * cosX;
+        let scale = cosX / config.divX;
         $("#iframe" + i).css({"width":innerWidth - config.divX,
-            "height":innerHeight * cosY / cosX - config.divX,
+            "height":cellHeight / scale - config.divX,
             "-ms-zoom": 1 / cosX,
             "-moz-transform":"scale(" + scale  + ")",
             "-o-transform":"scale(" + scale  + ")",
@@ -319,10 +266,11 @@
         console.log(text);
         let url = "/config/update/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
         $.post(domain + url, {}, function (result) {
+            console.log("save result: " + result);
             if (result === "SUCCESS") {
-                refreshSpecify(current);
                 $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");
                 config.list[current - 1].src = text;
+                refreshSpecify(current);
             }
         });
         editModal.modal("hide");
@@ -370,9 +318,9 @@
     // 刷新指定frame
     function refreshSpecify(index) {
         let url = config.list[index - 1].src;
+        console.log("refresh: " + url);
         if (url.indexOf("proxy:") === 0) {
             url = domain + "/proxy/html?url=" + escape(url.replace("proxy:", ""));
-            console.log(url);
         }
         $("#iframe" + index).attr("src", url);
     }
