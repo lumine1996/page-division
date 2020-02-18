@@ -186,7 +186,7 @@
 
         // 单元格处理
         config.list = [];
-        for (let i = 1; i < 5; i ++) {
+        for (let i = 1; i <= countCell; i ++) {
             let cellConfig = {};
             cellConfig.index = i;
             cellConfig.src = $("#src" + i).val();
@@ -230,13 +230,20 @@
             success: function(result){
                 console.log(result);
                 myAlert(result);
-                if (result === "SUCCESS" && isNew) {
-                    configList.push(config.configName);
-                    $("#ulMenu").append("<li id='menu" + configList.length + "'><a href='#'"  +
-                        " onclick='edit(" + configList.length +")'>" + config.configName +
-                        "</a></li>");
-                    $("#dropdown").append("<li id='dropdown'" + configList.length + "'><a href='/custom.html?" +
-                        "configName=" + config.configName + "'>" + config.configName + "</a></li>")
+                if (result === "SUCCESS") {
+                    if (isNew) {
+                        configList.push(config.configName);
+                        $("#ulMenu").append("<li id='menu" + configList.length + "'><a href='#'"  +
+                            " onclick='edit(" + configList.length +")'>" + config.configName +
+                            "</a></li>");
+                        $("#dropdown").append("<li id='dropdown'" + configList.length + "'><a href='/custom.html?" +
+                            "configName=" + config.configName + "'>" + config.configName + "</a></li>");
+                        myAlert("添加成功！");
+                    } else {
+                        myAlert("保存成功！");
+                    }
+                } else {
+                    myAlert("保存时出现异常，请联系开发人员！");
                 }
             }
         });
@@ -294,8 +301,8 @@
 
     // 提示框
     function myAlert(text) {
-        // Todo 提示框
-        alert(text);
+        $("#alertModal").modal("show");
+        $("#alertBody").text(text);
     }
 
     function fillAll() {
@@ -432,6 +439,22 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
                 <button type="button" class="btn btn-danger" onclick="remove()">删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 提示模态框 -->
+<div class="modal fade" id="alertModal" tabindex="-1" role="dialog" aria-labelledby="alertModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="top: 25%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="alertModalLabel">提示</h4>
+            </div>
+            <div class="modal-body" id="alertBody" style="font-size: 18px"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">关闭</button>
             </div>
         </div>
     </div>

@@ -8,6 +8,7 @@ import com.cgm.pagesplit.entity.PageConfig;
 import com.cgm.pagesplit.service.IConfigService;
 import com.cgm.pagesplit.util.JsonUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class ConfigServiceImpl implements IConfigService {
     public PageConfig queryCurrent() {
         String json = JsonUtils.readJsonFile(GLOBAL_CONFIG_FILE);
         GlobalConfig globalConfig = JSON.parseObject(json, GlobalConfig.class);
-        if (globalConfig == null) {
+        if (globalConfig == null || StringUtils.isEmpty(globalConfig.getCurrentConfig())) {
             return new PageConfig();
         }
         return queryByName(globalConfig.getCurrentConfig());
@@ -89,11 +90,7 @@ public class ConfigServiceImpl implements IConfigService {
 
     @Override
     public String updateCurrent(String name) {
-        String jsonOld = JsonUtils.readJsonFile(GLOBAL_CONFIG_FILE);
-        GlobalConfig globalConfig = JSON.parseObject(jsonOld, GlobalConfig.class);
-        if (globalConfig == null) {
-            return "FAILED: Failed to read config";
-        }
+        GlobalConfig globalConfig = new GlobalConfig();
 
         // 修改当前配置，写文件
         globalConfig.setCurrentConfig(name);

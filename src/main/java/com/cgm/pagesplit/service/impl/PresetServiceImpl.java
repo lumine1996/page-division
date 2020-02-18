@@ -94,10 +94,6 @@ public class PresetServiceImpl implements IPresetService {
      */
     private Boolean initConfig(File configFile) {
         try {
-            // 判断父目录是否存在，如果不存在，则创建
-            if (configFile.getParentFile() != null && !configFile.getParentFile().exists()) {
-                configFile.getParentFile().mkdirs();
-            }
             if (!configFile.createNewFile()) {
                 return false;
             }

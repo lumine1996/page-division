@@ -29,7 +29,7 @@ public class HttpUtils {
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build();
              CloseableHttpResponse response = httpClient.execute(requestBase)) {
             return EntityUtils.toString(response.getEntity(), "utf-8");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

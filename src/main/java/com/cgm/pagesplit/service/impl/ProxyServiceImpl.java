@@ -27,6 +27,9 @@ public class ProxyServiceImpl implements IProxyService {
 
         StringBuilder stringBuilder = new StringBuilder(html);
         int index = html.indexOf("<head>");
+        if (index < 0) {
+            index = html.indexOf("</title>");
+        }
         stringBuilder.insert(index, "<base href=\"" + domain + "\">");
 
         return stringBuilder.toString();
