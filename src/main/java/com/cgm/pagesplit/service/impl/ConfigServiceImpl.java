@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Service
 public class ConfigServiceImpl implements IConfigService {
-    private static final String USER_CONFIG_PATH = System.getProperty("user.home") + "/PageSplit/";
+    private static final String USER_CONFIG_PATH = System.getProperty("user.home") + "/PageDivision/";
     private static final String GLOBAL_CONFIG_NAME = "global";
     private static final String GLOBAL_CONFIG_FILE = USER_CONFIG_PATH + "global.json";
 

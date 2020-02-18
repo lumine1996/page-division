@@ -1,1 +1,1 @@
-const domain  = "http://47.100.137.154:8090";
+const domain  = "http://127.0.0.1:8090";

@@ -24,45 +24,11 @@ public class ProxyServiceImpl implements IProxyService {
     public static String replaceDomain(String url) throws IOException {
         String html = HttpUtils.doGet(url);
         String domain = url.split("//")[0] + "//" + url.split("/")[2] + "/";
-        String parent = url.substring(0, url.lastIndexOf("/"));
-        if (html.contains("src='/")) {
-            html = html.replaceAll("src='/", "src='" + domain);
-        }
-        if (html.contains("src=\"/")) {
-            html = html.replaceAll("src=\"/", "src=\"" + domain);
-        }
-        if (html.contains("src = '/")) {
-            html = html.replaceAll("src = '/", "src = '" + domain);
-        }
-        if (html.contains("src = \"/")) {
-            html = html.replaceAll("src = \"/", "src = \"" + domain);
-        }
 
-        if (html.contains("href='/")) {
-            html = html.replaceAll("href='/", "href='" + domain);
-        }
-        if (html.contains("href=\"/")) {
-            html = html.replaceAll("href=\"/", "href=\"" + domain);
-        }
-        if (html.contains("href = '/")) {
-            html = html.replaceAll("href = '/", "href = '" + domain);
-        }
-        if (html.contains("href = \"/")) {
-            html = html.replaceAll("href = \"/", "href = \"" + domain);
-        }
+        StringBuilder stringBuilder = new StringBuilder(html);
+        int index = html.indexOf("<head>");
+        stringBuilder.insert(index, "<base href=\"" + domain + "\">");
 
-        if (html.contains("=\"./")) {
-            html = html.replaceAll("=\"./", "=\"" + parent + "/");
-        }
-        if (html.contains("='./")) {
-            html = html.replaceAll("='./", "='" + parent + "/");
-        }
-        if (html.contains("= \"./")) {
-            html = html.replaceAll("= \"./", "= \"" + parent + "/");
-        }
-        if (html.contains("= './")) {
-            html = html.replaceAll("= './", "= '" + parent + "/");
-        }
-        return html;
+        return stringBuilder.toString();
     }
 }

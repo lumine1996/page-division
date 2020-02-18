@@ -18,7 +18,7 @@ import java.util.Properties;
 public class PresetServiceImpl implements IPresetService {
     // 项目内置预设文件
     private static final String BUILD_IN_CONFIG_FILE = "preset-config.txt";
-    private static final String PRESET_CONFIG_FILE = System.getProperty("user.home") + "/PageSplit/preset-config.txt";
+    private static final String PRESET_CONFIG_FILE = System.getProperty("user.home") + "/PageDivision/preset-config.txt";
 
     @Override
     public List<String> getConfigList() {
