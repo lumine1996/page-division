@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cgm</groupId>
     <artifactId>page-division</artifactId>
-    <version>1.2.0-SNAPSHOT</version>
+    <version>1.2.1-SNAPSHOT</version>
     <name>page-division</name>
     <description>网页分屏</description>
 
@@ -41,6 +41,12 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.3.3</version>
         </dependency>
     </dependencies>
 

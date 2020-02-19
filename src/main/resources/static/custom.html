@@ -244,11 +244,12 @@
 
     // 保存
     function save() {
+        let seq = current;
         let text = $("#input1").val();
         let forbiddenSpan = $("#forbiddenSpan");
         let editModal = $("#editModal");
         // 未修改
-        if (text === config.list[current - 1].src) {
+        if (text === config.list[seq - 1].src) {
             editModal.modal("hide");
             return false;
         }
@@ -264,13 +265,13 @@
         }
 
         console.log(text);
-        let url = "/config/update/src?configName=" + config.configName + "&index=" + current + "&src=" + text;
+        let url = "/config/update/src?configName=" + config.configName + "&index=" + seq + "&src=" + text;
         $.post(domain + url, {}, function (result) {
             console.log("save result: " + result);
             if (result === "SUCCESS") {
-                $("#cover" + current).attr("onclick", "fullScreen(" + current + ")");
-                config.list[current - 1].src = text;
-                refreshSpecify(current);
+                $("#cover" + seq).attr("onclick", "fullScreen(" + seq + ")");
+                config.list[seq - 1].src = text;
+                refreshSpecify(seq);
             }
         });
         editModal.modal("hide");
@@ -318,7 +319,7 @@
     // 刷新指定frame
     function refreshSpecify(index) {
         let url = config.list[index - 1].src;
-        console.log("refresh: " + url);
+        console.log("refresh " + index + ": " + url);
         if (url.indexOf("proxy:") === 0) {
             url = domain + "/proxy/html?url=" + escape(url.replace("proxy:", ""));
         }
